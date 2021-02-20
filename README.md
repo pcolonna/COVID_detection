@@ -14,7 +14,7 @@ All this will be done using the PyTorch framework.
 
 The dataset consists of 3886 png images. The resolution is either 1024x1024 and 256x256 pixels. ResNet-18 expects 224x224 pixels images as input, so we will resize them thanks to torchvision transforms.
 
-![X-ray](COVID_1128.png?raw=true "X-ray of a Covid-19 positive patient")
+![X-ray](./COVID_1128.png?raw=true "X-ray of a Covid-19 positive patient")
 
 
 ## Resnet-18   
