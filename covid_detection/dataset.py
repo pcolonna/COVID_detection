@@ -1,3 +1,7 @@
+import torch
+from PIL import Image
+import os
+
 class ChestXRayDataset(torch.utils.data.Dataset):
     def __init__(self, image_dirs, transform):
         # transform will do basic image augmentation

@@ -1,64 +1,35 @@
-def train(epochs):
-    print("Starting training...")
+import torch
+import dataset
+import transform
+import train
 
-    for e in range(0, epochs):
-        print("=" * 20)
-        print(f"Starting epoch {e + 1} / {epochs}")
-        print("=" * 20)
+def main():
+    batch_size = 6
 
-        train_loss = 0
 
-        # Set the model to training again
-        resnet18.train()
+    train_dirs = {
+        'normal': 'data/COVID-19 Radiography Database/normal',
+        'viral': 'data/COVID-19 Radiography Database/viral',
+        'covid': 'data/COVID-19 Radiography Database/covid'
+    }
 
-        # We enumerate over the data loader, so over eveything
-        for train_step, (images, labels) in enumerate(dl_train):
-            # we reinitialize the optimizer and set the grads to 0
-            optimizer.zero_grad()
 
-            # Now get the ouptus
-            outputs = resnet18(images)
+    test_dirs = {
+        'normal': 'data/COVID-19 Radiography Database/test/normal',
+        'viral': 'data/COVID-19 Radiography Database/test/viral',
+        'covid': 'data/COVID-19 Radiography Database/test/covid'
+    }
 
-            loss = loss_fn(outputs, labels)
+    train_transform, test_transform = transform.get_transforms()
+    train_dataset = dataset.ChestXRayDataset(train_dirs, train_transform)
+    test_dataset = dataset.ChestXRayDataset(test_dirs, test_transform)
 
-            # Now we take a gradient step
-            loss.backward()
-            optimizer.step()  # Will update the parameters values
+    dl_train = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-            train_loss += loss.item()  # loss is a tensor, so append loss.item
+    dl_test = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-            if train_step % 20 == 0:
-                # Every twenty steps, evaluate the model
-                print("Evaluating at step", train_step)
-                acc = 0.0
-                val_loss = 0.0
-                resnet18.eval()
+    print("Num of training batches", len(dl_train))
+    print("Num of test batches", len(dl_test))
 
-                for val_step, (images, labels) in enumerate(dl_test):
-                    outputs = resnet18(images)
-                    loss = loss_fn(outputs, labels)
-
-                    val_loss += loss.item()
-
-                    _, preds = torch.max(outputs, 1)
-
-                    # we add to accuracy the number of correct predictions
-                    # True is 1 and False 0
-                    acc += sum((preds == labels).numpy())
-
-                val_loss /= val_step + 1
-                acc = acc / len(test_dataset)
-
-                print(f"val loss: {val_loss:.4f}, Acc: {acc:.4f}")
-                show_preds()
-
-                resnet18.train()
-
-                # We set a stop condition
-                if acc > 0.95:
-                    print("Performance condition satisfied....")
-                    return
-
-        train_loss /= train_test + 1
-
-        print(f"Training loss: {train_loss:.4f}")
+if __name__ == '__main__':
+    main()
