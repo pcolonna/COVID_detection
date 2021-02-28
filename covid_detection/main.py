@@ -1,24 +1,17 @@
-import torch
+import os
+
+import config
 import dataset
-import transform
+import torch
 import train
+import transform
+
 
 def main():
     batch_size = 6
 
-
-    train_dirs = {
-        'normal': 'data/COVID-19 Radiography Database/normal',
-        'viral': 'data/COVID-19 Radiography Database/viral',
-        'covid': 'data/COVID-19 Radiography Database/covid'
-    }
-
-
-    test_dirs = {
-        'normal': 'data/COVID-19 Radiography Database/test/normal',
-        'viral': 'data/COVID-19 Radiography Database/test/viral',
-        'covid': 'data/COVID-19 Radiography Database/test/covid'
-    }
+    train_dirs = config.train_dirs
+    test_dirs = config.test_dirs
 
     train_transform, test_transform = transform.get_transforms()
     train_dataset = dataset.ChestXRayDataset(train_dirs, train_transform)
@@ -31,5 +24,6 @@ def main():
     print("Num of training batches", len(dl_train))
     print("Num of test batches", len(dl_test))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
