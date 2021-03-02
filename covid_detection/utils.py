@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
-
+import torch
+import numpy as np 
 
 def show_images(images, labels, preds):
     """Display six images from the dataset"""
@@ -35,7 +36,7 @@ def show_images(images, labels, preds):
     plt.show()
 
 
-def show_preds(resnet18):
+def show_preds(resnet18, dl_test):
     """We define a method to show prediction, using the previous method to show images"""
     # We set the model to evaluation mode
     resnet18.eval()

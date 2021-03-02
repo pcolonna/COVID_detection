@@ -75,22 +75,21 @@ def prepare_train_test_set(image_dirs):
             for c in class_names:
                 os.mkdir(os.path.join(root_data_dir, "test", c))
 
-        # for i, d in enumerate(config.train_dirs):
-        #     os.rename(os.path.join(root_dir, d), os.path.join(root_dir, class_names[i]))
-
         for c in class_names:
             images = [x for x in os.listdir(config.original_data_dir[c]) if x.lower().endswith("png")]
             random.shuffle(images)
 
-            selected_test_images = images[:30]  # random.sample(images, 30)
-            selected_train_images = images[30:]  # random.sample(images, 30)
+            selected_test_images = images[:30]  
+            selected_train_images = images[30:]
 
-            for image in selected_test_images:
-                source_path = os.path.join(config.original_data_dir[c], image)
-                target_path = os.path.join(root_data_dir, "test", c, image)
-                shutil.copy(source_path, target_path)
+            if not os.listdir(os.path.join(root_data_dir, "test", c)):
+                for image in selected_test_images:
+                    source_path = os.path.join(config.original_data_dir[c], image)
+                    target_path = os.path.join(root_data_dir, "test", c, image)
+                    shutil.copy(source_path, target_path)
 
-            for image in selected_train_images:
-                source_path = os.path.join(config.original_data_dir[c], image)
-                target_path = os.path.join(root_data_dir, "train", c, image)
-                shutil.copy(source_path, target_path)
+            if not os.listdir(os.path.join(root_data_dir, "train", c)):
+                for image in selected_train_images:
+                    source_path = os.path.join(config.original_data_dir[c], image)
+                    target_path = os.path.join(root_data_dir, "train", c, image)
+                    shutil.copy(source_path, target_path)

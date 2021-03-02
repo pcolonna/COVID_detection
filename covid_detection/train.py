@@ -1,5 +1,11 @@
-def train(epochs):
+import model
+import torch
+import utils
+
+def main(dl_train, dl_test, test_dataset, epochs):
     print("Starting training...")
+
+    modified_resnet, loss_fn, optimizer = model.create()
 
     for e in range(0, epochs):
         print("=" * 20)
@@ -9,7 +15,7 @@ def train(epochs):
         train_loss = 0
 
         # Set the model to training again
-        resnet18.train()
+        modified_resnet.train()
 
         # We enumerate over the data loader, so over eveything
         for train_step, (images, labels) in enumerate(dl_train):
@@ -17,7 +23,7 @@ def train(epochs):
             optimizer.zero_grad()
 
             # Now get the ouptus
-            outputs = resnet18(images)
+            outputs = modified_resnet(images)
 
             loss = loss_fn(outputs, labels)
 
@@ -28,14 +34,14 @@ def train(epochs):
             train_loss += loss.item()  # loss is a tensor, so append loss.item
 
             if train_step % 20 == 0:
-                # Every twenty steps, evaluate the model
+                # Every twenty steps, evaluate the modified_resnet
                 print("Evaluating at step", train_step)
                 acc = 0.0
                 val_loss = 0.0
-                resnet18.eval()
+                modified_resnet.eval()
 
                 for val_step, (images, labels) in enumerate(dl_test):
-                    outputs = resnet18(images)
+                    outputs = modified_resnet(images)
                     loss = loss_fn(outputs, labels)
 
                     val_loss += loss.item()
@@ -50,15 +56,15 @@ def train(epochs):
                 acc = acc / len(test_dataset)
 
                 print(f"val loss: {val_loss:.4f}, Acc: {acc:.4f}")
-                show_preds()
+                # utils.show_preds(modified_resnet, dl_test)
 
-                resnet18.train()
+                modified_resnet.train()
 
                 # We set a stop condition
                 if acc > 0.95:
                     print("Performance condition satisfied....")
-                    return
+                    return 0
+    # return "Done"
+        # train_loss /= train_test + 1
 
-        train_loss /= train_test + 1
-
-        print(f"Training loss: {train_loss:.4f}")
+        # print(f"Training loss: {train_loss:.4f}")
