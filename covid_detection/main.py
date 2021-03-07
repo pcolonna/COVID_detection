@@ -1,3 +1,4 @@
+import logging
 import os
 
 import config
@@ -6,9 +7,12 @@ import torch
 import train
 import transform
 
+logging.basicConfig(format="%(asctime)s     %(levelname)s   %(message)s", level=logging.INFO)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print('Using device:', device)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+logging.info(f"Using device: {device} \n")
+
 
 def main():
 
@@ -25,11 +29,11 @@ def main():
 
     dl_test = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-    print("Num of training batches", len(dl_train))
-    print("Num of test batches", len(dl_test))
-
+    logging.info(f"Num of training batches {len(dl_train)}")
+    logging.info(f"Num of test batches {len(dl_test)}\n")
 
     train.main(dl_train, dl_test, test_dataset, epochs=10)
+
 
 if __name__ == "__main__":
     main()

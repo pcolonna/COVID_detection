@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import shutil
@@ -5,6 +6,8 @@ import shutil
 import config
 import torch
 from PIL import Image
+
+logging.basicConfig(format="%(asctime)s     %(levelname)s   %(message)s", level=logging.INFO)
 
 
 class ChestXRayDataset(torch.utils.data.Dataset):
@@ -18,7 +21,7 @@ class ChestXRayDataset(torch.utils.data.Dataset):
         def get_images(class_name):
             # enumerate the list of images
             images = [x for x in os.listdir(image_dirs[class_name]) if x.endswith("png")]
-            print(f"Found {len(images)} {class_name} examples")
+            logging.info(f"Found {len(images)} {class_name} examples")
 
             return images
 
@@ -79,7 +82,7 @@ def prepare_train_test_set(image_dirs):
             images = [x for x in os.listdir(config.original_data_dir[c]) if x.lower().endswith("png")]
             random.shuffle(images)
 
-            selected_test_images = images[:30]  
+            selected_test_images = images[:30]
             selected_train_images = images[30:]
 
             if not os.listdir(os.path.join(root_data_dir, "test", c)):

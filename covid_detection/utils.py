@@ -1,6 +1,7 @@
-from matplotlib import pyplot as plt
+import numpy as np
 import torch
-import numpy as np 
+from matplotlib import pyplot as plt
+
 
 def show_images(images, labels, preds):
     """Display six images from the dataset"""

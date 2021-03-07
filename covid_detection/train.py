@@ -1,11 +1,15 @@
+import logging
+
 import model
 import torch
 import utils
+from early_stopping import EarlyStopping
 
-from early_stopping import EarlyStopping 
+logging.basicConfig(format="%(asctime)s     %(levelname)s   %(message)s", level=logging.INFO)
+
 
 def main(dl_train, dl_test, test_dataset, epochs):
-    print("Starting training...")
+    logging.info("Starting training...")
 
     # initialize the early_stopping object
     early_stopping = EarlyStopping(patience=2)
@@ -13,7 +17,7 @@ def main(dl_train, dl_test, test_dataset, epochs):
     modified_resnet, loss_fn, optimizer = model.create()
 
     for e in range(0, epochs):
-        print("=" * 20)
+        print("\n" + "=" * 20)
         print(f"Starting epoch {e + 1} / {epochs}")
         print("=" * 20)
 
@@ -38,47 +42,37 @@ def main(dl_train, dl_test, test_dataset, epochs):
 
             train_loss += loss.item()  # loss is a tensor, so append loss.item
 
-            if train_step % 20 == 0:
-                # Every twenty steps, evaluate the modified_resnet
-                print("Evaluating at step", train_step)
-                acc = 0.0
-                val_loss = 0.0
-                modified_resnet.eval()
+            logging.info(f"Training loss: {train_loss}")
 
-                for val_step, (images, labels) in enumerate(dl_test):
-                    outputs = modified_resnet(images)
-                    loss = loss_fn(outputs, labels)
+        logging.info(f"Evaluating at end of epoch {e + 1}")
 
-                    val_loss += loss.item()
+        acc = 0.0
+        val_loss = 0.0
+        modified_resnet.eval()
 
-                    _, preds = torch.max(outputs, 1)
+        for val_step, (images, labels) in enumerate(dl_test):
+            outputs = modified_resnet(images)
+            loss = loss_fn(outputs, labels)
 
-                    # we add to accuracy the number of correct predictions
-                    # True is 1 and False 0
-                    acc += sum((preds == labels).numpy())
+            val_loss += loss.item()
 
-                val_loss /= val_step + 1
-                acc = acc / len(test_dataset)
+            _, preds = torch.max(outputs, 1)
 
-                print(f"val loss: {val_loss:.4f}, Acc: {acc:.4f}")
-                # utils.show_preds(modified_resnet, dl_test)
+            # we add to accuracy the number of correct predictions
+            # True is 1 and False 0
+            acc += sum((preds == labels).numpy())
 
-                modified_resnet.train()
+        val_loss /= val_step + 1
+        acc = acc / len(test_dataset)
 
-                # We set a stop condition
-                # if acc == 1:
-                #     print("Performance condition satisfied....")
-                #     return 0
+        logging.info(f"Validation loss: {val_loss:.4f}, Accuracy: {acc:.4f}")
+        # utils.show_preds(modified_resnet, dl_test)
 
-                # early_stopping needs the validation loss to check if it has decresed, 
-                # and if it has, it will make a checkpoint of the current model
-                early_stopping(val_loss, modified_resnet)
-        
-                if early_stopping.early_stop:
-                    print("Early stopping")
-                    break
-    
-        # return "Done"
-        # train_loss /= train_test + 1
+        modified_resnet.train()
 
-        # print(f"Training loss: {train_loss:.4f}")
+        # early_stopping needs the validation loss to check if it has decresed,
+        # and if it has, it will make a checkpoint of the current model
+        early_stopping(val_loss, acc, modified_resnet)
+
+        if early_stopping.early_stop:
+            break

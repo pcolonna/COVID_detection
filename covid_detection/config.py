@@ -19,3 +19,5 @@ test_dirs = {
     "viral": root_data_dir + "test/viral",
     "covid": root_data_dir + "test/covid",
 }
+
+best_model_path = root_data_dir + "best.model.pt"
