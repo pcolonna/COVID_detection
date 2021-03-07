@@ -42,7 +42,7 @@ def main(dl_train, dl_test, test_dataset, epochs):
 
             train_loss += loss.item()  # loss is a tensor, so append loss.item
 
-            logging.info(f"Training loss: {train_loss}")
+            logging.info(f"Training loss: {train_loss / (train_step + 1)}")
 
         logging.info(f"Evaluating at end of epoch {e + 1}")
 
