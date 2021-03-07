@@ -2,8 +2,13 @@ import model
 import torch
 import utils
 
+from early_stopping import EarlyStopping 
+
 def main(dl_train, dl_test, test_dataset, epochs):
     print("Starting training...")
+
+    # initialize the early_stopping object
+    early_stopping = EarlyStopping(patience=2)
 
     modified_resnet, loss_fn, optimizer = model.create()
 
@@ -61,10 +66,19 @@ def main(dl_train, dl_test, test_dataset, epochs):
                 modified_resnet.train()
 
                 # We set a stop condition
-                if acc > 0.95:
-                    print("Performance condition satisfied....")
-                    return 0
-    # return "Done"
+                # if acc == 1:
+                #     print("Performance condition satisfied....")
+                #     return 0
+
+                # early_stopping needs the validation loss to check if it has decresed, 
+                # and if it has, it will make a checkpoint of the current model
+                early_stopping(val_loss, modified_resnet)
+        
+                if early_stopping.early_stop:
+                    print("Early stopping")
+                    break
+    
+        # return "Done"
         # train_loss /= train_test + 1
 
         # print(f"Training loss: {train_loss:.4f}")

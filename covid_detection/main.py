@@ -5,7 +5,6 @@ import dataset
 import torch
 import train
 import transform
-import sys
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -13,7 +12,7 @@ print('Using device:', device)
 
 def main():
 
-    batch_size = 6
+    batch_size = 16
 
     train_dirs = config.train_dirs
     test_dirs = config.test_dirs
@@ -30,7 +29,7 @@ def main():
     print("Num of test batches", len(dl_test))
 
 
-    train.main(dl_train, dl_test, test_dataset, epochs=1)
+    train.main(dl_train, dl_test, test_dataset, epochs=10)
 
 if __name__ == "__main__":
-    sys.settrace(main())
+    main()
